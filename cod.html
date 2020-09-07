@@ -1,0 +1,153 @@
+<div class="menu">
+  <a href="map" class="menu-btn"><img id = "articleAll" class = "menuButton" src="view/img/open-menu.png"></a>
+  <nav class="menu-list">
+    <div id="bar">
+      <div class="headerBar">
+        <div>
+          <a href="#"><img id="buttonFilter" class="buttonFilter" src="view/img/filter.png"></a>
+        </div>
+        <div class="regionName">
+          <div id="regionName" class=""><h1><?php echo $name;?></h1></div>
+        </div>
+      </div>
+
+      <div id = "filter" class="filter">
+        <form class="blockCategories" method="post" name="form">
+          <!--Регионы-->
+          <div class="filterRegion">
+            <div class="" style="display:grid;grid-template-columns:3fr 1fr;margin: 10px;">
+                    <p style="text-align:left;">Регионы</p>
+                    <a href="#"  style="text-align:right;"><img Class="openCategory buttonOpenRegions" id="buttonOpenRegions" src="view/img/down-arrow.svg"></a>
+            </div>
+            <div class="" id="regions" style="">
+                    <!-- <label class="container">
+                      <input type="checkbox" value="all" checked="checked" onclick="checkAll(this)">
+                      <span class="checkmark"></span>
+                      Выбрать все
+                    </label> -->
+
+                    <?php foreach ($regions as $a):?>
+                      <? $checked = "";
+                      if (in_array($a['regionCod'],$allCod)) {
+                        $checked = "checked";
+                      }else{
+                        $checked = " ";
+                      }
+                       ?>
+                        <label class="container">
+                              <input type="checkbox" <?= $checked ?>  name="region[]" value="<?=$a['regionCod']?>">
+                              <span class="checkmark"></span>
+                              <?echo $a['name'];?>
+                        </label>
+                    <?php endforeach ?>
+            </div>
+          </div>
+          <!--Категории-->
+          <div class="filterCategiry">
+            <div class="" style="display:grid;grid-template-columns:3fr 1fr;margin: 10px;">
+                    <p style="text-align:left;">Категории</p>
+                    <a href="#"  style="text-align:right;"><img Class="openCategory buttonOpenCategories" id="buttonOpenCategories" src="view/img/down-arrow.svg"></a>
+            </div>
+            <div class="" id="categories" style="">
+                    <!-- <label class="container">
+                      <input type="checkbox" value="all" checked="checked" onclick="checkAll(this)">
+                      <span class="checkmark"></span>
+                      Выбрать все
+                    </label> -->
+                      <?php foreach ($categories as $a):?>
+                        <? $checked = "";
+                        if (in_array($a['idCat'],$allCat)) {
+                          $checked = "checked";
+                        }else{
+                          $checked = " ";
+                        }
+                         ?>
+                      <label class="container">
+                            <input type="checkbox" <?=$checked?> name="category[]" value="<?=$a['idCat']?>">
+                            <span class="checkmark"></span>
+                            <?echo $a['category'];?>
+                      </label>
+                      <?php endforeach ?>
+            </div>
+          </div>
+          <!-- <select id="sort" name="sort" class="form-control">
+            <option value="price_asc">По цене, сначала дешевые</option>
+            <option value="price_desc">По цене, сначала дорогие</option>
+            <option value="rating_desc">По популярности</option>
+            <option value="good_asc">По названию, A-Z</option>
+            <option value="good_desc">По названию, Z-A</option>
+          </select> -->
+          <!-- Поиск -->
+          <a href="articleall"><input id="buttonFiterSearch" class="blockButtonFiterSearch" name="filter" type="submit" value="Найти"/></a>
+        </form>
+      </div>
+
+      <!--Статьи-->
+       <div id = "articles" class="articles" style=" overflow-x: auto;">
+        <?php foreach ($articles as $b):?>
+          <a href="<?=$b['id']?>"/>
+            <div class="articleBar">
+              <img class="articleImg" src="view/img/<?=mb_strtolower($b['regionCod'])."/".$b['id']."/".$b['img']?>" >
+              <div class="barArticleTitle">
+                <p><?echo $b['title'];?></p>
+              </div>
+              <div style="padding:20px;">
+                <em class="emBar"style="text-align: left;width:30%;float:left;">Регион: </em>
+                <?php
+                  $category = $b['idCat'];
+                  $region = $b['regionCod'];//Номер региона
+                  $query2 = sprintf("SELECT name FROM regions WHERE regionCod = '$region'");
+                  $result2 = mysqli_query($link, $query2);
+                  if (!$result2) die(mysqli_error($link));
+                  $n2 = mysqli_num_rows($result2);
+                  $reg = array();
+                  for($i = 0; $i < $n2; $i++){
+                      $row = mysqli_fetch_assoc($result2);
+                      $reg[] = $row;
+                  }
+                  foreach ($reg as $b){
+                    $nameReg = $b['name'];//Номер региона
+                  }
+
+                  $sql = sprintf("SELECT category FROM category WHERE idCat = '$category'");
+                  $result = mysqli_query($link, $sql);
+                  if (!$result) die(mysqli_error($link));
+                  $n = mysqli_num_rows($result);
+                  $category = array();
+                  for($i = 0; $i < $n; $i++){
+                      $row = mysqli_fetch_assoc($result);
+                      $category[] = $row;
+                  }
+
+                  foreach ($category as $a){
+                    $category = $a['category'];//Номер региона
+                  }
+                    ?>
+                <em class="emBar" style="text-align: right;width:70%;float:right;"><?= $nameReg;?></em><br>
+                <em class="emBar"style="text-align: left;width:30%;float:left;">Категория: </em>
+                <em class="emBar" style="text-align: right;width:70%;float:right;"><?= $category;?></em><br>
+              </div>
+            </div>
+          </a>
+        <?php endforeach ?>
+      </div>
+
+    </div>
+
+  </nav>
+</div>
+<!--articleall-->
+<script type="text/javascript">
+$('.menu-btn').on('click', function(e) {
+  e.preventDefault();
+  $('.menu').toggleClass('menu_active');
+  $('.menu-btn').toggleClass('menu-btnON');
+    if ($(".menuButton").attr("src") == "view/img/open-menu.png"){
+        $('.menuButton').attr('src','view/img/back.png');
+    }else{
+        $('.menuButton').attr('src','view/img/open-menu.png');
+    }
+
+});
+
+</script>
